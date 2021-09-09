@@ -1,0 +1,7 @@
+# ignore everything
+*
+
+# but this file
+!main.py
+!README.md
+!.gitignore
