@@ -1,13 +1,11 @@
 Repository to ease the hard work of an evalens deleguate
 
 ## To use the code
-Place all the files you want to process in the "input" folder
+Place all your files in the input folder and run:
 
     python -m main
 
-All the processed file will appear in the "output" folder
-
-##### Parameters
+or to set some parameters:
 
     python -m main with input_folder=<INPUT_PATH> output_folder=<OUTPUT_PATH> output_prefix=<PREFIX>
 
