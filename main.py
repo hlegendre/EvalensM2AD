@@ -1,15 +1,18 @@
 import pandas as pd
+import os
 import sacred
 
 ex = sacred.Experiment("SummarizeResult")
 
+
 @ex.config
 def config():
-    input_name = "input.xls"
-    output_name = "output.xlsx"
+    input_folder = "input"
+    output_folder = "output"
+    output_prefix = "[PROCESSED] "
 
-@ex.automain
-def main(input_name, output_name):
+@ex.capture
+def process_file(input_name, output_name, output_prefix):
     # ------ Reading the file ------ #
     evalens_file = pd.read_excel(input_name, header=None)
 
@@ -35,11 +38,16 @@ def main(input_name, output_name):
         result_dataframe.loc[question_id, "Intitulé Question"] = question
 
         # very satisfied
-        tres_satisfait = evalens_file.iloc[index+3, 2]
+        n_tres_satisfait = evalens_file.iloc[index+3, 1]
+        n_satisfait = evalens_file.iloc[index+4, 1]
+        n_autre = evalens_file.iloc[index+5, 1]\
+             + evalens_file.iloc[index+6, 1]\
+
+        tres_satisfait = n_tres_satisfait / (n_tres_satisfait + n_satisfait + n_autre)
         result_dataframe.loc[question_id, "Très Satisfaits"] = tres_satisfait
 
         # satisfied
-        satisfait = evalens_file.iloc[index+4, 2]
+        satisfait = n_satisfait / (n_tres_satisfait + n_satisfait + n_autre)
         result_dataframe.loc[question_id, "Satisfaits"] = satisfait
 
         # sum of both
@@ -60,7 +68,11 @@ def main(input_name, output_name):
         score_colors[question_id] = color
 
     # ------ Creating the output excel file ------ #
-    writer = pd.ExcelWriter(output_name, engine='xlsxwriter')
+
+    writer = pd.ExcelWriter(
+        os.path.join(os.path.dirname(output_name), output_prefix + os.path.basename(output_name)[:-4] + ".xlsx"),
+        engine='xlsxwriter'
+    )
 
     workbook = writer.book
 
@@ -199,5 +211,15 @@ def main(input_name, output_name):
     )
 
     # Copying the evalens file in another sheet
-    evalens_file.to_excel(writer, sheet_name="Détails et commentaires")
+    evalens_file.to_excel(writer, sheet_name="Détails et commentaires", index=False, header=False)
     writer.save()
+
+
+@ex.automain
+def main(input_folder, output_folder):
+    for file_name in os.listdir(input_folder):
+        process_file(
+            input_name=os.path.join(input_folder, file_name),
+            output_name=os.path.join(output_folder, file_name)
+        )
+        print("Done - Find results in", os.path.join(output_folder, file_name))
