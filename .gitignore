@@ -1,10 +1,1 @@
-# ignore everything
-*
-
-# but this file
-!main.py
-!README.md
-!.gitignore
-!requirements.txt
-!input
-!output
+.idea

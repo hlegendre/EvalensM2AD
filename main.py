@@ -218,8 +218,10 @@ def process_file(input_name, output_name, output_prefix):
 @ex.automain
 def main(input_folder, output_folder):
     for file_name in os.listdir(input_folder):
-        process_file(
-            input_name=os.path.join(input_folder, file_name),
-            output_name=os.path.join(output_folder, file_name)
-        )
-        print("Done - Find results in", os.path.join(output_folder, file_name))
+        if file_name!=".gitignore":
+            process_file(
+                input_name=os.path.join(input_folder, file_name),
+                output_name=os.path.join(output_folder, file_name)
+            )
+    print("All the files in {} have been processed".format(input_folder))
+    print("Check the processed file in {}".format(output_folder))
