@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import sacred
 
-ex = sacred.Experiment("SummarizeResult")
+ex = sacred.Experiment("SummarizeResult", save_git_info=False)
 
 
 @ex.config
@@ -10,6 +10,7 @@ def config():
     input_folder = "input"
     output_folder = "output"
     output_prefix = "[PROCESSED] "
+
 
 @ex.capture
 def process_file(input_name, output_name, output_prefix):
