@@ -1,11 +1,11 @@
 VENV="./venv"
 if ! [ -d "$VENV" ]; then
-  sudo apt install python3.9-venv
-  python -m venv $VENV || python3 -m venv $VENV
+  pip install virtualenv
+  virtualenv -p python3 $VENV || virtualenv -p python $VENV
   source $VENV/bin/activate
   $VENV/bin/pip install -r requirements.txt
 else
   source $VENV/bin/activate
 fi
 
-python -m main || python3 -m main
+python3 -m main || python -m main
