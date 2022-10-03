@@ -19,10 +19,12 @@ def process_file(input_name, output_name, output_prefix):
 
     # ------ Determining the questions ------ #
     # Distinguishing between the open questions and the normal questions
-    questions_indices = evalens_file[evalens_file[0].str.startswith("Résumé pour Q").fillna(False)].index
-    questions_libre_indices = evalens_file[evalens_file[0].str.startswith("Identifiant (ID)").fillna(False)].index
-    questions_libre_indices = [max([x for x in questions_indices if x < i]) for i in questions_libre_indices]
-    questions_indices = [x for x in questions_indices if x not in questions_libre_indices]
+    question_headlines_starts = ("Résumé pour Q", "Summary for Q")
+    question_indices = evalens_file[evalens_file[0].str.startswith(question_headlines_starts).fillna(False)].index
+    open_question_starts = ("Identifiant (ID)", "ID")
+    open_question_indices = evalens_file[evalens_file[0].str.startswith(open_question_starts).fillna(False)].index
+    open_question_indices = [max([x for x in question_indices if x < i]) for i in open_question_indices]
+    question_indices = [x for x in question_indices if x not in open_question_indices]
 
 
     # ------ Creating the result frame ------ #
@@ -32,7 +34,7 @@ def process_file(input_name, output_name, output_prefix):
     # save the colors separately
     score_colors = {}
 
-    for i, index in enumerate(questions_indices):
+    for i, index in enumerate(question_indices):
         # identifying the question
         question_id = evalens_file.iloc[index, 0].split(' ')[-1]
         question = evalens_file.iloc[index + 1, 0]
@@ -219,7 +221,7 @@ def process_file(input_name, output_name, output_prefix):
 @ex.automain
 def main(input_folder, output_folder):
     for file_name in os.listdir(input_folder):
-        if file_name!=".gitignore":
+        if file_name != ".gitignore":
             process_file(
                 input_name=os.path.join(input_folder, file_name),
                 output_name=os.path.join(output_folder, file_name)
