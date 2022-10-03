@@ -221,7 +221,7 @@ def process_file(input_name, output_name, output_prefix):
 @ex.automain
 def main(input_folder, output_folder):
     for file_name in os.listdir(input_folder):
-        if file_name != ".gitignore":
+        if file_name.endswith(".xls"):
             process_file(
                 input_name=os.path.join(input_folder, file_name),
                 output_name=os.path.join(output_folder, file_name)
